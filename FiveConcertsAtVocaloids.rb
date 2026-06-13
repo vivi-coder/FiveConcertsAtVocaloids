@@ -10,18 +10,18 @@
 =end
 
 # Strings
-listofcommands = "signaldisruptor, camera1, banana, camera2, orange, checkdoor, doorbutton, quit"
+listofcommands = "signaldisruptor, camera1, banana, camera2, orange, checkleftdoor, checkrightdoor, checkstage, doorbuttonr, doorbuttonl, curtains, quit"
 randomsignaltext = ["You feel something in the WiFi \n", "A Sound is playing in the WiFi \n", "*Ding* The WiFi makes \n"]
 game_over = false
 
 # Vocaloids state
 vocaloids = {
-  "Miku" => {"InSignal?" => false, "Speed" => 5},
-  "Len" => {"InCamera1?" => false, "Banana" => false},
-  "Rin" => {"InCamera2?" => false, "Orange" => false},
-  "Kaito" => {"MoveCounter" => 3, "IsAtLeftDoor?" => false},
-  "Meiko" => {"MoveCounter" => 5, "IsAtRightDoor?" => false},
-  "Luka" => {"MoveCounter" => 4, "IsAtLeftDoor?" => false}
+  "Miku" => {"InSignal?" => false},
+  "Len" => {"InCamera1?" => false},
+  "Rin" => {"InCamera2?" => false},
+  "Kaito" => {"IsAtLeftDoor?" => false},
+  "Meiko" => {"IsAtRightDoor?" => false},
+  "Luka" => {"IsAtStageCurtains?" => false}
 }
 
 # Start
@@ -70,7 +70,7 @@ Thread.new do
     sleep(wait_time_len)
     vocaloids["Len"]["InCamera1?"] = true
     elapsed_len = 0
-    while elapsed_len < 25
+    while elapsed_len < 34
       sleep(0.1)
       elapsed_len += 0.1
       if vocaloids["Len"]["InCamera1?"] == false
@@ -89,11 +89,11 @@ end
 Thread.new do
   loop do
     break if game_over
-    wait_time_rin = [30, 25, 29].sample
+    wait_time_rin = [35, 18, 23].sample
     sleep(wait_time_rin)
     vocaloids["Rin"]["InCamera2?"] = true 
     elapsed_rin = 0
-    while elapsed_rin < 25
+    while elapsed_rin < 30
       sleep(0.1)
       elapsed_rin += 0.1
       if vocaloids["Rin"]["InCamera2?"] == false
@@ -102,6 +102,75 @@ Thread.new do
 
     if vocaloids["Rin"]["InCamera2?"] == true
       puts "GAME OVER, You Died by Rin, Try checking camera 2 and give her the orange! (camera2 orange)"
+      game_over = true
+      break
+    end
+  end
+end
+
+# Kaito Thread
+Thread.new do
+  loop do
+    break if game_over
+    wait_time_kaito = [24, 23, 30].sample
+    sleep(wait_time_kaito)
+    vocaloids["Kaito"]["IsAtLeftDoor?"] = true
+    elapsed_kaito = 0
+    while elapsed_kaito < 25
+      sleep(0.1)
+      elapsed_kaito += 0.1
+      if vocaloids["Kaito"]["IsAtLeftDoor?"] == false
+      end
+    end
+
+    if vocaloids["Kaito"]["IsAtLeftDoor?"] == true
+      puts "GAME OVER, You Died by Kaito, Try checking the left door and close it on his face! (checkleftdoor, doorbuttonl)"
+      game_over = true
+      break
+    end
+  end
+end
+
+# Meiko Thread
+Thread.new do
+  loop do
+    break if game_over
+    wait_time_meiko = [29, 19, 30].sample
+    sleep(wait_time_meiko)
+    vocaloids["Meiko"]["IsAtRightDoor?"] = true
+    elapsed_meiko = 0
+    while elapsed_meiko < 23
+      sleep(0.1)
+      elapsed_meiko += 0.1
+      if vocaloids["Meiko"]["IsAtRightDoor?"] == false
+      end
+    end
+
+    if vocaloids["Meiko"]["IsAtRightDoor?"] == true
+      puts "GAME OVER, You Died by Meiko, Try checking the right door next time and close it! (checkrightdoor, doorbuttonr)"
+      game_over = true
+      break
+    end
+  end
+end
+
+# Luka Thread
+Thread.new do
+  loop do
+    break if game_over
+    wait_time_luka = [39, 29, 33].sample
+    sleep(wait_time_luka)
+    vocaloids["Luka"]["IsAtStageCurtains?"] = true
+    elapsed_luka = 0
+    while elapsed_luka < 33
+      sleep(0.1)
+      elapsed_luka += 0.1
+      if vocaloids["Luka"]["IsAtStageCurtains?"] == false
+      end
+    end
+
+    if vocaloids["Luka"]["IsAtStageCurtains?"] == true
+      puts "GAME OVER, You Died by Luka, Try checking the stage curtains next time and close them! (checkstage, curtains)"
       game_over = true
       break
     end
@@ -117,6 +186,24 @@ loop do
   
   if user_input == "help"
     puts "Commands: #{listofcommands}"
+  elsif user_input == "checkrightdoor"
+    if vocaloids["Meiko"]["IsAtRightDoor?"] == true
+    puts "You feel something is there"
+    elsif vocaloids["Meiko"]["IsAtRightDoor?"] == false
+    puts "Theres nothing.."
+    end
+  elsif user_input == "checkleftdoor"
+    if vocaloids["Kaito"]["IsAtLeftDoor?"] == true
+    puts "You see 2 blue eyes"
+    elsif vocaloids["Kaito"]["IsAtLeftDoor?"] == false
+    puts "The other side of the door is dark.."
+    end
+  elsif user_input == "checkstage"
+    if vocaloids["Luka"]["IsAtStageCurtains?"] == true
+    puts "You see someone but its too blury"
+    elsif vocaloids["Luka"]["IsAtStageCurtains?"] == false
+    puts "You see the seats but only silence.."
+    end
   elsif user_input == "signaldisruptor"
     puts "Disrupting WiFi signals..."
     vocaloids["Miku"]["InSignal?"] = false
@@ -132,12 +219,21 @@ loop do
     elsif vocaloids["Rin"]["InCamera2?"] == false
       puts "You see nothing there.."
     end
+  elsif user_input == "doorbuttonr"
+    puts "You close the right door.."
+    vocaloids["Meiko"]["IsAtRightDoor?"] = false
+  elsif user_input == "doorbuttonl"
+    puts "You close the left door.."
+    vocaloids["Kaito"]["IsAtLeftDoor?"] = false
   elsif user_input == "banana"
     puts "Giving Len a banana..."
     vocaloids["Len"]["InCamera1?"] = false
   elsif user_input == "orange"
     puts "Giving Rin a orange..."
     vocaloids["Rin"]["InCamera2?"] = false
+  elsif user_input == "curtains"
+    puts "You click the lever to close the stage curtains"
+    vocaloids["Luka"]["IsAtStageCurtains?"] = false
   elsif user_input == "quit"
     puts "ENDING JOB EARLY.."
     game_over = true
